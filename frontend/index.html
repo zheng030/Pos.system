@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>POS 點餐系統</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <div id="home">
+        <div class="menu-btn" onclick="openTableSelect()">🛒 點餐系統</div>
+        <div class="menu-btn" onclick="openPage('historyPage')">📋 今日訂單</div>
+        <div class="menu-btn">📦 庫存管理</div><div class="menu-btn">📊 營業報表</div>
+        <div class="menu-btn">🧾 匯出Excel</div><div class="menu-btn">👤 會員管理</div>
+        <div class="menu-btn">🛠 系統設定</div><div class="menu-btn">🌙 夜間模式</div>
+        <div class="menu-btn">🔐 權限</div><div class="menu-btn">🏷 活動優惠</div>
+        <div class="menu-btn">📍 分店</div><div class="menu-btn">💬 加料客製</div>
+        <div class="menu-btn">📨 電子發票</div><div class="menu-btn">🧮 日結</div>
+        <div class="menu-btn">📦 進貨記錄</div><div class="menu-btn">🔍 商品搜尋</div>
+    </div>
+
+    <div id="tableSelect">
+        <div class="header-row">
+            <button class="back" onclick="goHome()">⬅ 返回主畫面</button>
+            <div id="systemTime">載入中...</div>
+        </div>
+        <div class="title">請選擇座位</div>
+        
+        <div class="legend-box">
+            <span class="legend-item"><span class="dot white"></span> 空桌</span>
+            <span class="legend-item"><span class="dot red"></span> 訂單未確認</span>
+            <span class="legend-item"><span class="dot yellow"></span> 用餐中 (已送單)</span>
+        </div>
+
+        <div id="tableSelectGrid"></div>
+    </div>
+
+    <div id="orderPage">
+        <div class="order-header">
+            <button class="back" onclick="saveAndExit()">⬅ 返回 (暫存/未確認)</button>
+            <div class="title-group">
+                <span class="title">🛒 點餐中 <span id="seatLabel"></span></span>
+                <div id="seatTimer">⏳ 入座時間：00:00</div>
+            </div>
+        </div>
+        
+        <div class="customer-input-box">
+            <input type="text" id="custName" placeholder="輸入客人姓名" oninput="autoSaveCustomerInfo()">
+            <input type="tel" id="custPhone" placeholder="輸入電話號碼" oninput="autoSaveCustomerInfo()">
+        </div>
+
+        <div id="menuGrid"></div> 
+
+        <div id="cart-container">
+            <h2>🧾 訂單明細</h2>
+            <div id="cart-list"></div>
+            <p id="total">總金額：0 元</p>
+            
+            <div class="action-buttons">
+                <button class="save-btn" onclick="saveOrderManual()">📝 送單暫存 (確認用餐)</button>
+                <button class="checkout-btn" onclick="checkout()">💰 結帳 / 清桌</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="historyPage">
+        <button class="back" onclick="goHome()">⬅ 返回主畫面</button>
+        <div class="title">📋 今日訂單列表</div>
+        
+        <div class="history-header-row">
+            <span>序號</span>
+            <span>桌號</span>
+            <span>客人資訊</span>
+            <span>時間</span>
+            <span>金額</span>
+        </div>
+        
+        <div id="history-box"></div>
+        <button onclick="clearHistory()" class="del-all-btn">清除全部紀錄</button>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>

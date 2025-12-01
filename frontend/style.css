@@ -1,0 +1,109 @@
+body {
+    font-family: "Microsoft JhengHei", sans-serif;
+    margin: 0;
+    background: #f4f4f7;
+    text-align: center;
+    -webkit-tap-highlight-color: transparent;
+}
+button { cursor: pointer; font-size: 16px; }
+
+.header-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
+
+#systemTime {
+    font-size: 18px; font-weight: bold; color: #555; background: #e9ecef; padding: 10px 15px; border-radius: 8px;
+}
+#seatTimer {
+    font-size: 16px; color: #d63384; font-weight: bold; margin-top: 5px;
+}
+
+.title-group { text-align: left; }
+.title { font-size: 28px; font-weight: 800; margin-bottom: 5px; display: block; }
+.back {
+    background: #333; color: white; border: none; padding: 10px 20px; border-radius: 6px; font-size: 15px;
+}
+
+/* ========== 主畫面 ========== */
+#home { display: grid; grid-template-columns: repeat(4, 1fr); gap: 15px; padding: 30px; }
+.menu-btn {
+    background: #ffffff; border-radius: 15px; padding: 25px 10px;
+    font-size: 18px; font-weight: bold; box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    display: flex; align-items: center; justify-content: center; min-height: 80px;
+}
+.menu-btn:active { transform: scale(0.95); background: #dfe8ff; }
+
+/* ========== 頁面結構 ========== */
+#orderPage, #historyPage, #tableSelect { display: none; padding: 25px; max-width: 1000px; margin: 0 auto; }
+.order-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 20px; }
+
+/* ========== 座位選擇 ========== */
+.legend-box { margin-bottom: 15px; font-size: 14px; color: #555; display: flex; justify-content: center; gap: 15px; flex-wrap: wrap; }
+.legend-item { display: flex; align-items: center; gap: 5px; }
+.dot { width: 15px; height: 15px; border-radius: 3px; display: inline-block; border: 1px solid #ccc; }
+.dot.white { background: white; }
+.dot.red { background: #dc3545; border: none; }
+.dot.yellow { background: #ffc107; border: none; }
+
+#tableSelectGrid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px; margin-top: 10px; }
+.tableBtn {
+    padding: 25px; font-size: 22px; border-radius: 12px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    cursor: pointer; transition: .25s; font-weight: bold;
+    display: flex; flex-direction: column; justify-content: center; align-items: center;
+    min-height: 80px; border: 2px solid transparent;
+}
+.tableBtn:active { transform: scale(0.95); }
+
+.status-white { background: white; color: #333; border: 1px solid #ddd; }
+.status-red { background: #dc3545; color: white; box-shadow: 0 0 10px rgba(220, 53, 69, 0.4); }
+.status-yellow { background: #ffc107; color: #333; box-shadow: 0 0 10px rgba(255, 193, 7, 0.4); }
+
+/* ========== 點餐頁 & 客人輸入框 ========== */
+.customer-input-box {
+    display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 20px;
+}
+.customer-input-box input {
+    padding: 15px; font-size: 18px; border: 2px solid #ddd; border-radius: 8px; outline: none; transition: .2s;
+}
+.customer-input-box input:focus { border-color: #007bff; background: #f0f8ff; }
+
+#menuGrid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px; margin-top: 10px; }
+.categoryBtn {
+    background: white; border-radius: 10px; padding: 30px;
+    font-size: 22px; font-weight: bold; box-shadow: 0 0 10px rgba(0, 0, 0, 0.15);
+}
+.categoryBtn:active { background: #dff2ff; transform: scale(0.95); }
+
+.itemsBox { grid-column: 1 / -1; background: white; padding: 20px; border-radius: 8px; margin-top: 10px; text-align: left; }
+.item { display: flex; justify-content: space-between; align-items: center; padding: 15px; border-bottom: 1px solid #eee; font-size: 18px; }
+.item button { padding: 8px 20px; border-radius: 6px; background: #28a745; color: white; border: none; }
+.back-to-cat { width: 100%; padding: 15px; background: #6c757d; color: white; border: none; border-radius: 8px; margin-bottom: 15px; font-size: 18px; }
+
+#cart-container { background: #fff; padding: 20px; border-radius: 8px; margin-top: 20px; box-shadow: 0 -2px 10px rgba(0,0,0,0.1); }
+.action-buttons { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 15px; }
+.save-btn { padding: 15px; background: #ffc107; color: #333; border: none; border-radius: 8px; font-size: 20px; font-weight: bold; }
+.checkout-btn { padding: 15px; background: #007bff; color: white; border: none; border-radius: 8px; font-size: 20px; }
+.del-btn { background: #dc3545; color: white; border: none; padding: 5px 10px; border-radius: 4px; margin-left: 10px; }
+.del-all-btn { margin-top: 10px; background: #e66; color: white; padding: 10px; border: none; border-radius: 5px; }
+
+/* ========== 今日訂單列表樣式 ========== */
+.history-header-row {
+    display: grid;
+    grid-template-columns: 0.8fr 1fr 2fr 1fr 1fr; /* 欄位寬度比例 */
+    background: #333; color: white; padding: 15px; border-radius: 8px 8px 0 0;
+    font-weight: bold; font-size: 16px;
+}
+
+.history-row {
+    display: grid;
+    grid-template-columns: 0.8fr 1fr 2fr 1fr 1fr;
+    background: #fff; padding: 15px; border-bottom: 1px solid #eee;
+    align-items: center; cursor: pointer; transition: .2s;
+    font-size: 16px;
+}
+.history-row:hover { background: #f1f7ff; }
+.history-row:active { background: #e1efff; }
+
+/* 針對小螢幕或 iPad 直向，可能需要調整字體大小 */
+@media (max-width: 768px) {
+    .history-header-row, .history-row { font-size: 14px; padding: 10px; }
+}
