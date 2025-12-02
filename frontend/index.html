@@ -77,7 +77,6 @@
         </div>
         
         <div id="history-box"></div>
-        
         <button onclick="closeBusiness()" class="end-business-btn">🛑 結束營業 (日結)</button>
     </div>
 
@@ -97,6 +96,110 @@
             <div class="modal-actions">
                 <button onclick="closeSummaryModal()" style="background:#888;">取消</button>
                 <button onclick="confirmClearData()" style="background:#d33;">✅ 確認結帳並歸零</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="customModal" class="modal">
+        <div class="modal-content" style="text-align:left;">
+            <h2 style="text-align:center;">🍹 <span id="customTitle">隱藏特調</span>客製化</h2>
+            
+            <div class="custom-section">
+                <div class="custom-label">1. 香氣選擇</div>
+                <div class="radio-group">
+                    <label><input type="radio" name="flavor" value="花香調" checked> 花香調 🌸</label>
+                    <label><input type="radio" name="flavor" value="果香調"> 果香調 🍎</label>
+                    <label><input type="radio" name="flavor" value="木質調"> 木質調 🌲</label>
+                </div>
+            </div>
+
+            <div class="custom-section">
+                <div class="custom-label">2. 口感偏好</div>
+                <div class="radio-group">
+                    <label><input type="radio" name="taste" value="偏酸" checked> 偏酸 🍋</label>
+                    <label><input type="radio" name="taste" value="偏甜"> 偏甜 🍯</label>
+                    <label><input type="radio" name="taste" value="偏苦"> 偏苦 ☕</label>
+                    <label><input type="radio" name="taste" value="偏鹹"> 偏鹹 🧂</label>
+                </div>
+            </div>
+
+            <div id="modalAlcoholSection" class="custom-section">
+                <div class="custom-label">3. 濃度調整 (<span id="alcoholVal">0</span>%)</div>
+                <input type="range" id="alcoholRange" min="0" max="100" step="10" value="0" style="width:100%;" oninput="document.getElementById('alcoholVal').innerText=this.value">
+                <div style="display:flex;justify-content:space-between;font-size:12px;color:#888; margin-bottom:10px;">
+                    <span>正常</span>
+                    <span>加重</span>
+                    <span>雙倍</span>
+                </div>
+                <button id="extraShotBtn" onclick="toggleExtraShot()" class="extra-shot-btn">
+                    🍺 濃度升級 (+$40)
+                </button>
+            </div>
+
+            <div id="modalNoteSection" class="custom-section" style="display:none;">
+                <div class="custom-label">3. 備註 (選填)</div>
+                <textarea id="customNote" rows="2" placeholder="例如：少冰、不要裝飾..." style="width:100%; padding:10px; border-radius:8px; border:1px solid #ccc; font-size:16px;"></textarea>
+            </div>
+
+            <div class="modal-actions">
+                <button onclick="closeCustomModal()" style="background:#888;">取消</button>
+                <button onclick="confirmCustomItem()" style="background:#28a745;">✅ 確認加入</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="drinkModal" class="modal">
+        <div class="modal-content" style="text-align:left;">
+            <h2 style="text-align:center;">🥤 <span id="drinkTitle">飲料</span>選項</h2>
+            
+            <div id="simpleTempSection" class="custom-section" style="display:none;">
+                <div class="custom-label">溫度選擇</div>
+                <div class="radio-group">
+                    <label><input type="radio" name="simpleTemp" value="冰" checked> 🧊 冰</label>
+                    <label><input type="radio" name="simpleTemp" value="熱"> 🔥 熱</label>
+                </div>
+            </div>
+
+            <div id="advanceTempSection" class="custom-section" style="display:none;">
+                <div class="custom-label">冰塊/溫度</div>
+                <div class="radio-group" style="font-size:14px;">
+                    <label><input type="radio" name="advTemp" value="去冰" checked> 去冰</label>
+                    <label><input type="radio" name="advTemp" value="微冰"> 微冰</label>
+                    <label><input type="radio" name="advTemp" value="少冰"> 少冰</label>
+                    <label><input type="radio" name="advTemp" value="溫"> 溫</label>
+                    <label><input type="radio" name="advTemp" value="熱"> 熱</label>
+                </div>
+            </div>
+
+            <div id="sugarSection" class="custom-section" style="display:none;">
+                <div class="custom-label">甜度選擇</div>
+                <div class="radio-group">
+                    <label><input type="radio" name="sugar" value="無糖" checked> 無糖</label>
+                    <label><input type="radio" name="sugar" value="微糖"> 微糖</label>
+                    <label><input type="radio" name="sugar" value="少糖"> 少糖</label>
+                    <label><input type="radio" name="sugar" value="全糖"> 全糖</label>
+                </div>
+            </div>
+
+            <div class="modal-actions">
+                <button onclick="closeDrinkModal()" style="background:#888;">取消</button>
+                <button onclick="confirmDrinkItem()" style="background:#28a745;">✅ 確認加入</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="foodOptionModal" class="modal">
+        <div class="modal-content" style="text-align:left;">
+            <h2 style="text-align:center;">🍛 <span id="foodTitle">餐點</span>配料</h2>
+            
+            <div class="custom-section">
+                <div class="custom-label">請選擇配料：</div>
+                <div class="radio-group nowrap" id="meatOptions"></div>
+            </div>
+
+            <div class="modal-actions">
+                <button onclick="closeFoodModal()" style="background:#888;">取消</button>
+                <button onclick="confirmFoodItem()" style="background:#28a745;">✅ 確認加入</button>
             </div>
         </div>
     </div>
