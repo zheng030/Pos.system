@@ -166,25 +166,23 @@ button { cursor: pointer; font-size: 16px; }
 
 .custom-section { margin-bottom: 20px; text-align: left; }
 .custom-label { font-weight: bold; margin-bottom: 8px; color: #333; font-size: 18px; }
+
+/* ✨ 全新單選按鈕樣式 (修復選不中問題) */
 .radio-group { display: flex; flex-wrap: wrap; gap: 10px; }
-.radio-group label {
-    background: #f1f1f1; padding: 10px 15px; border-radius: 8px; cursor: pointer; flex: 1; text-align: center; font-size: 16px;
-    border: 2px solid transparent;
+.radio-box { cursor: pointer; flex: 1; }
+.radio-box input { display: none; } /* 隱藏原點 */
+.radio-btn {
+    background: #f1f1f1; padding: 10px 15px; border-radius: 8px; 
+    text-align: center; font-size: 16px; border: 2px solid transparent; transition: .2s;
 }
-.radio-group input[type="radio"] { display: none; }
-.radio-group input[type="radio"]:checked + label {
+/* 選中狀態 */
+.radio-box input:checked + .radio-btn {
     background: #e7f3ff; border-color: #007bff; color: #007bff; font-weight: bold;
 }
 
-/* ✨ 強制不換行的 Radio Group (炒飯配料用) */
-.radio-group.nowrap {
-    flex-wrap: nowrap;
-    overflow-x: auto; /* 如果螢幕太小，可以左右滑動 */
-}
-.radio-group.nowrap label {
-    white-space: nowrap; /* 文字不換行 */
-    min-width: 70px; /* 最小寬度，避免擠壓 */
-}
+/* 強制不換行的群組 */
+.radio-group.nowrap { flex-wrap: nowrap; overflow-x: auto; }
+.radio-group.nowrap .radio-box { min-width: 80px; }
 
 input[type=range] { -webkit-appearance: none; background: transparent; }
 input[type=range]::-webkit-slider-thumb {

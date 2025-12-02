@@ -164,12 +164,16 @@ const menuData = {
         { name: "龍膽石斑魚湯", price: 280 },
         { name: "味繒鮭魚", price: 0 } 
     ],
+    // ✨ 新增：炸物更新
     "炸物": [
-        { name: "薯條", price: 100 },
-        { name: "雞塊", price: 120 },
-        { name: "洋蔥圈", price: 120 },
-        { name: "起司條", price: 150 },
-        { name: "綜合拼盤", price: 300 }
+        { name: "嫩炸豆腐", price: 80 },
+        { name: "脆薯", price: 100 },
+        { name: "雞塊", price: 100 },
+        { name: "鑫鑫腸", price: 100 },
+        { name: "雞米花", price: 100 },
+        { name: "洋蔥圈", price: 100 },
+        { name: "酥炸魷魚", price: 0 }, // 時價
+        { name: "炸物拼盤", price: 400 }
     ],
     "厚片": [
         { name: "花生厚片", price: 80 },
@@ -321,7 +325,7 @@ function checkItemType(name, price, categoryName) {
         openCustomModal(name, price);
         return;
     }
-    if (name === "隱藏啤酒" || name === "味繒鮭魚") return;
+    if (name === "隱藏啤酒" || name === "味繒鮭魚" || name === "酥炸魷魚") return;
 
     if (categoryName === "咖啡") {
         openDrinkModal(name, price, "coffee");
@@ -336,7 +340,6 @@ function checkItemType(name, price, categoryName) {
         return;
     }
 
-    // 主餐特殊處理
     if (categoryName === "主餐") {
         if (name === "炒飯") {
             openFoodModal(name, price, "friedRice");
@@ -351,7 +354,6 @@ function checkItemType(name, price, categoryName) {
     addToCart(name, price);
 }
 
-// ✨ 主餐彈窗：使用 label 包覆 input，確保點擊範圍正確
 function openFoodModal(name, price, type) {
     tempCustomItem = { name, price, type };
     document.getElementById("foodTitle").innerText = name;
@@ -360,19 +362,17 @@ function openFoodModal(name, price, type) {
     meatOptions.innerHTML = ""; 
 
     if (type === "friedRice") {
-        // 炒飯有蝦仁 ($110)
         meatOptions.innerHTML = `
-            <label><input type="radio" name="meat" value="牛" checked> 牛 ($90)</label>
-            <label><input type="radio" name="meat" value="豬"> 豬 ($90)</label>
-            <label><input type="radio" name="meat" value="雞"> 雞 ($90)</label>
-            <label><input type="radio" name="meat" value="蝦仁"> 蝦仁 ($110)</label>
+            <label class="radio-box"><input type="radio" name="meat" value="牛" checked><div class="radio-btn">牛 ($90)</div></label>
+            <label class="radio-box"><input type="radio" name="meat" value="豬"><div class="radio-btn">豬 ($90)</div></label>
+            <label class="radio-box"><input type="radio" name="meat" value="雞"><div class="radio-btn">雞 ($90)</div></label>
+            <label class="radio-box"><input type="radio" name="meat" value="蝦仁"><div class="radio-btn">蝦仁 ($110)</div></label>
         `;
     } else {
-        // 烏龍麵/親子丼 (價格固定)
         meatOptions.innerHTML = `
-            <label><input type="radio" name="meat" value="牛" checked> 牛</label>
-            <label><input type="radio" name="meat" value="豬"> 豬</label>
-            <label><input type="radio" name="meat" value="雞"> 雞</label>
+            <label class="radio-box"><input type="radio" name="meat" value="牛" checked><div class="radio-btn">牛</div></label>
+            <label class="radio-box"><input type="radio" name="meat" value="豬"><div class="radio-btn">豬</div></label>
+            <label class="radio-box"><input type="radio" name="meat" value="雞"><div class="radio-btn">雞</div></label>
         `;
     }
     foodOptionModal.style.display = "flex";
@@ -383,14 +383,12 @@ function closeFoodModal() {
     tempCustomItem = null;
 }
 
-// ✨ 確認加入主餐
 function confirmFoodItem() {
     if (!tempCustomItem) return;
     
     let meat = document.querySelector('input[name="meat"]:checked').value;
     let finalPrice = tempCustomItem.price;
 
-    // 如果是炒飯且選了蝦仁，價格變 110
     if (tempCustomItem.type === "friedRice") {
         if (meat === "蝦仁") {
             finalPrice = 110;
@@ -472,6 +470,14 @@ function addSalmonPrice() {
     if(isNaN(price) || price <= 0) { alert("請輸入金額！"); return; }
     addToCart("味繒鮭魚", price);
     document.getElementById("salmonPrice").value = "";
+}
+
+// ✨ 新增：酥炸魷魚時價輸入
+function addFriedSquidPrice() {
+    let price = parseInt(document.getElementById("squidPrice").value);
+    if(isNaN(price) || price <= 0) { alert("請輸入金額！"); return; }
+    addToCart("酥炸魷魚", price);
+    document.getElementById("squidPrice").value = "";
 }
 
 function addShotSet(name, price) {
@@ -570,8 +576,8 @@ function openItems(category) {
     let data = menuData[category];
     let backBtn = `<button class="back-to-cat" onclick="buildCategories()">⬅ 返回 ${category} 分類</button>`;
 
-    // 需要使用條列式的分類
-    if (["shot", "啤酒", "咖啡", "飲料", "厚片", "主餐"].includes(category)) {
+    // 需要使用條列式的分類 (包含炸物)
+    if (["shot", "啤酒", "咖啡", "飲料", "厚片", "主餐", "炸物"].includes(category)) {
         let html = backBtn;
         data.forEach(item => {
             let actionsHtml = "";
@@ -590,6 +596,13 @@ function openItems(category) {
                 actionsHtml = `
                     <input type="number" id="salmonPrice" class="inline-input" placeholder="金額" style="width:80px;">
                     <button onclick="addSalmonPrice()" style="background:#28a745;">加入</button>
+                `;
+            }
+            else if (item.name === "酥炸魷魚") {
+                nameHtml = `<span>酥炸魷魚 <b style="color:#d33;">(時價)</b></span>`;
+                actionsHtml = `
+                    <input type="number" id="squidPrice" class="inline-input" placeholder="金額" style="width:80px;">
+                    <button onclick="addFriedSquidPrice()" style="background:#28a745;">加入</button>
                 `;
             }
             else if (category === "shot") {
@@ -615,33 +628,46 @@ function openItems(category) {
         return;
     }
 
-    // 物件結構 (調酒、純飲、燒烤) -> 瀑布流/摺疊
+    // 物件結構 (調酒、燒烤) -> 瀑布流/摺疊
+    // ✨ 修改：純飲 (category === "純飲") 改回直接顯示 (不摺疊)
     if (!Array.isArray(data)) {
         let html = `<button class="back-to-cat" onclick="buildCategories()">⬅ 返回主選單</button>`;
+        
         Object.keys(data).forEach((subCat, index) => {
             let items = data[subCat];
-            let accId = `acc-${index}`;
-            html += `
-                <button class="accordion-header" onclick="toggleAccordion('${accId}')">
-                    ${subCat} <span class="arrow">▼</span>
-                </button>
-                <div id="${accId}" class="accordion-content">
-            `;
             
-            if(items.length === 0) {
-                html += `<div style="padding:10px; color:#999;">(暫無品項)</div>`;
-            } else {
+            // 純飲：使用靜態標題 (sub-cat-title) + 直接列表
+            if (category === "純飲") {
+                html += `<div class="sub-cat-title">${subCat}</div>`;
                 items.forEach(item => {
-                    let rowClass = (category === "燒烤") ? "item shot-item" : "item";
+                    html += `
+                    <div class="item shot-item">
+                        <span>${item.name} <b>$${item.price}</b></span>
+                        <button onclick='checkItemType("${item.name}", ${item.price}, "${category}")'>加入</button>
+                    </div>`;
+                });
+            } 
+            // 其他 (燒烤、調酒)：使用摺疊選單 (Accordion)
+            else {
+                let accId = `acc-${index}`;
+                html += `
+                    <button class="accordion-header" onclick="toggleAccordion('${accId}')">
+                        ${subCat} <span class="arrow">▼</span>
+                    </button>
+                    <div id="${accId}" class="accordion-content">
+                `;
+                items.forEach(item => {
+                    let rowClass = "item shot-item";
                     html += `
                     <div class="${rowClass}">
                         <span>${item.name} <b>$${item.price}</b></span>
                         <button onclick='checkItemType("${item.name}", ${item.price}, "${category}")'>加入</button>
                     </div>`;
                 });
+                html += `</div>`; 
             }
-            html += `</div>`; 
         });
+        
         html += `<button class="back-to-cat" onclick="buildCategories()">⬅ 返回主選單</button>`;
         menuGrid.innerHTML = html;
         return;
