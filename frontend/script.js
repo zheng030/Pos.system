@@ -35,12 +35,16 @@ const totalText = document.getElementById("total");
 const historyBox = document.getElementById("history-box");
 const custNameInput = document.getElementById("custName");
 const custPhoneInput = document.getElementById("custPhone");
+const summaryModal = document.getElementById("summaryModal");
 
 /* ========== 1. 系統與初始化 ========== */
 setInterval(updateSystemTime, 1000);
+
 function updateSystemTime() {
     let now = new Date();
-    document.getElementById("systemTime").innerText = "🕒 " + now.toLocaleString('zh-TW', { hour12: false });
+    // 強制 24 小時制
+    let timeStr = now.toLocaleString('zh-TW', { hour12: false });
+    document.getElementById("systemTime").innerText = "🕒 " + timeStr;
 }
 
 function hideAll() {
@@ -139,11 +143,8 @@ function updateSeatTimerText() {
 }
 
 /* ========== 4. 按鈕邏輯 ========== */
-
 function saveAndExit(){
     let hasInfo = custNameInput.value || custPhoneInput.value;
-    
-    // 只要有購物車資料或輸入了客人資料，就變紅
     if(cart.length > 0 || hasInfo) {
         saveCartToStorage();
         setStatus(selectedTable, 'red'); 
@@ -175,6 +176,7 @@ function checkout() {
     
     // 紀錄今日訂單
     if(cart.length > 0){
+        // ✨ 強制使用 24 小時制紀錄時間
         let time = new Date().toLocaleString('zh-TW', { hour12: false });
         let total = cart.reduce((a, b) => a + b.price, 0);
         let info = tableCustomers[selectedTable] || {name:"", phone:""};
@@ -190,7 +192,7 @@ function checkout() {
         localStorage.setItem("orderHistory", JSON.stringify(historyOrders));
     }
     
-    // 清除資料
+    // 清除該桌資料
     delete tableCarts[selectedTable];
     delete tableTimers[selectedTable];
     delete tableStatuses[selectedTable];
@@ -203,6 +205,119 @@ function checkout() {
     openTableSelect();
 }
 
+/* ========== 5. 日結功能 ========== */
+
+function closeBusiness() {
+    let activeTables = Object.values(tableStatuses).filter(s => s === 'yellow').length;
+    if(activeTables > 0){
+        if(!confirm(`⚠️ 注意：還有 ${activeTables} 桌正在用餐中。\n確定要現在進行日結嗎？`)){
+            return;
+        }
+    }
+
+    if (!confirm("確定要【結束營業】並進行今日結算嗎？")) return;
+
+    let totalRevenue = historyOrders.reduce((acc, curr) => acc + curr.total, 0);
+    let totalCount = historyOrders.length;
+
+    document.getElementById("sumCount").innerText = totalCount + " 單";
+    document.getElementById("sumTotal").innerText = "$" + totalRevenue;
+    summaryModal.style.display = "flex";
+}
+
+function closeSummaryModal() {
+    summaryModal.style.display = "none";
+}
+
+function confirmClearData() {
+    localStorage.removeItem("orderHistory");
+    historyOrders = [];
+    closeSummaryModal();
+    showHistory(); 
+    alert("✅ 日結完成！今日營收已歸零，準備迎接新的一天。");
+}
+
+/* ========== 6. 今日訂單列表 (含刪除單筆) ========== */
+function showHistory() {
+    historyBox.innerHTML = "";
+    let orders = [...historyOrders].reverse();
+
+    if(orders.length === 0) {
+        historyBox.innerHTML = "<div style='padding:20px;color:#888;'>今日尚無訂單</div>";
+        return;
+    }
+
+    orders.forEach((o, index) => {
+        let seq = historyOrders.length - index;
+        let custInfo = (o.customerName || o.customerPhone) 
+            ? `<span style="color:#007bff; font-weight:bold;">${o.customerName||""}</span> ${o.customerPhone||""}` 
+            : "<span style='color:#ccc'>-</span>";
+
+        let itemsDetail = o.items.map(i => 
+            `<div style="display:flex;justify-content:space-between;padding:5px 0;border-bottom:1px dotted #eee;">
+                <span>${i.name}</span> <span>$${i.price}</span>
+             </div>`
+        ).join("");
+
+        // 分割出時間部分 (例如 "2023/10/25 23:30:10" -> "23:30:10")
+        let timeOnly = o.time.split(" ")[1] || o.time;
+
+        let rowId = `detail-${index}`;
+        
+        // 注意：index 是反轉後的索引，刪除時要換算回原始索引
+        historyBox.innerHTML += `
+            <div class="history-row" onclick="toggleDetail('${rowId}')">
+                <span class="seq">#${seq}</span>
+                <span class="seat">${o.seat}</span>
+                <span class="cust">${custInfo}</span>
+                <span class="time">${timeOnly}</span>
+                <span class="amt">$${o.total}</span>
+            </div>
+            
+            <div id="${rowId}" class="history-detail" style="display:none;">
+                <div style="background:#f9f9f9; padding:15px; border-radius:0 0 8px 8px; border:1px solid #eee; border-top:none;">
+                    <b>📅 完整時間：</b>${o.time}<br>
+                    <b>🧾 內容：</b><br>
+                    ${itemsDetail}
+                    <div style="text-align:right; margin-top:10px; font-size:18px; font-weight:bold; color:#d33;">
+                        總計：$${o.total}
+                    </div>
+                    
+                    <div style="text-align:right; margin-top:15px; border-top:1px solid #ddd; padding-top:10px;">
+                        <button onclick="deleteSingleOrder(${index})" class="delete-single-btn">🗑 刪除此筆訂單</button>
+                    </div>
+                </div>
+            </div>
+        `;
+    });
+}
+
+// ✨ 刪除單筆訂單功能
+function deleteSingleOrder(displayIndex) {
+    if(!confirm("⚠️ 確定要刪除這筆訂單嗎？\n刪除後金額將從今日營收中扣除，無法復原。")) return;
+
+    // 因為顯示的是反轉後的陣列，所以要換算回原始陣列的索引
+    // 原始: [A, B, C] length=3
+    // 顯示: [C, B, A] (C是index 0)
+    // 要刪除 C (原始 index 2) => 3 - 1 - 0 = 2
+    let realIndex = historyOrders.length - 1 - displayIndex;
+
+    historyOrders.splice(realIndex, 1);
+    localStorage.setItem("orderHistory", JSON.stringify(historyOrders));
+    
+    showHistory(); // 重新渲染列表
+}
+
+window.toggleDetail = function(id) {
+    let el = document.getElementById(id);
+    if(el.style.display === "none") {
+        el.style.display = "block";
+    } else {
+        el.style.display = "none";
+    }
+}
+
+/* ========== 輔助 ========== */
 function saveAllStorage() {
     localStorage.setItem("tableCarts", JSON.stringify(tableCarts));
     localStorage.setItem("tableTimers", JSON.stringify(tableTimers));
@@ -219,7 +334,6 @@ function saveCartToStorage() {
     localStorage.setItem("tableCarts", JSON.stringify(tableCarts));
 }
 
-/* ========== 5. 點餐介面 ========== */
 function buildCategories() {
     menuGrid.innerHTML = "";
     categories.forEach(c => {
@@ -264,73 +378,6 @@ function removeItem(index) {
     cart.splice(index, 1);
     renderCart();
     saveCartToStorage();
-}
-
-/* ========== 6. 今日訂單 (摺疊式列表) ========== */
-function showHistory() {
-    historyBox.innerHTML = "";
-    let orders = [...historyOrders].reverse();
-
-    if(orders.length === 0) {
-        historyBox.innerHTML = "<div style='padding:20px;color:#888;'>今日尚無訂單</div>";
-        return;
-    }
-
-    orders.forEach((o, index) => {
-        let seq = historyOrders.length - index;
-        
-        let custInfo = "";
-        if(o.customerName || o.customerPhone){
-            custInfo = `<span style="color:#007bff; font-weight:bold;">${o.customerName || ""}</span> ${o.customerPhone || ""}`;
-        } else {
-            custInfo = "<span style='color:#ccc'>-</span>";
-        }
-
-        let itemsDetail = o.items.map(i => 
-            `<div style="display:flex;justify-content:space-between;padding:5px 0;border-bottom:1px dotted #eee;">
-                <span>${i.name}</span> <span>$${i.price}</span>
-             </div>`
-        ).join("");
-
-        let rowId = `detail-${index}`;
-        historyBox.innerHTML += `
-            <div class="history-row" onclick="toggleDetail('${rowId}')">
-                <span class="seq">#${seq}</span>
-                <span class="seat">${o.seat}</span>
-                <span class="cust">${custInfo}</span>
-                <span class="time">${o.time.split(" ")[1] || o.time}</span>
-                <span class="amt">$${o.total}</span>
-            </div>
-            
-            <div id="${rowId}" class="history-detail" style="display:none;">
-                <div style="background:#f9f9f9; padding:15px; border-radius:0 0 8px 8px; border:1px solid #eee; border-top:none;">
-                    <b>📅 日期：</b>${o.time}<br>
-                    <b>🧾 內容：</b><br>
-                    ${itemsDetail}
-                    <div style="text-align:right; margin-top:10px; font-size:18px; font-weight:bold; color:#d33;">
-                        總計：$${o.total}
-                    </div>
-                </div>
-            </div>
-        `;
-    });
-}
-
-window.toggleDetail = function(id) {
-    let el = document.getElementById(id);
-    if(el.style.display === "none") {
-        el.style.display = "block";
-    } else {
-        el.style.display = "none";
-    }
-}
-
-function clearHistory() {
-    if (confirm("確定清除所有今日訂單？這將無法復原。")) {
-        localStorage.removeItem("orderHistory");
-        historyOrders = [];
-        showHistory();
-    }
 }
 
 window.onload = function() { goHome(); showHistory(); };

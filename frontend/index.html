@@ -77,7 +77,28 @@
         </div>
         
         <div id="history-box"></div>
-        <button onclick="clearHistory()" class="del-all-btn">清除全部紀錄</button>
+        
+        <button onclick="closeBusiness()" class="end-business-btn">🛑 結束營業 (日結)</button>
+    </div>
+
+    <div id="summaryModal" class="modal">
+        <div class="modal-content">
+            <h2>📅 本日營業結算</h2>
+            <div class="summary-item">
+                <span>📦 總訂單數</span>
+                <span id="sumCount">0 單</span>
+            </div>
+            <div class="summary-item">
+                <span>💰 營業總額</span>
+                <span id="sumTotal" style="color:#d33;">$0</span>
+            </div>
+            <hr>
+            <p style="color:#666; font-size:14px;">確認後將清除資料，請確認已核對無誤。</p>
+            <div class="modal-actions">
+                <button onclick="closeSummaryModal()" style="background:#888;">取消</button>
+                <button onclick="confirmClearData()" style="background:#d33;">✅ 確認結帳並歸零</button>
+            </div>
+        </div>
     </div>
 
     <script src="script.js"></script>
